@@ -9,8 +9,6 @@ const connection = mysql.createConnection({
   database: process.env.DB_NAME,
 });
 
-connection.connect(handleConnection);
-
 function handleConnection(err) {
    if (err) throw err;
    console.log(`connected as id ${connection.threadId}`);
