@@ -234,7 +234,6 @@ function updateEmployeeRole(){
 
         ])
         .then(answers => {
-            console.log(answers.role[0]);
 
 
             connection.query("UPDATE employee SET ? WHERE ?",
