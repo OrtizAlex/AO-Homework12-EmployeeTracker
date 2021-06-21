@@ -22,6 +22,7 @@ function start(){
                 "Delete Employee",
                 "Delete Role",
                 "Delete Department",
+                "See Utilized Budget",
                 "Exit"
             ]
 
@@ -63,6 +64,9 @@ function start(){
                     break;
                 case "Delete Department":
                     deleteDepartment()
+                    break;
+                case "See Utilized Budget":
+                    utilizedBudget()
                     break;
                 case "Exit":
                     connection.end();
@@ -406,6 +410,39 @@ function deleteDepartment(){
                 }
             ],
             (err,res) => {
+                if (err) throw err;
+                start();
+            });
+        })
+    })
+}
+
+function utilizedBudget(){
+    connection.query("SELECT * FROM department", (err,res) => {
+        if(err) throw err;
+
+        var departmentList = [];
+        res.forEach(department => {departmentList.push(department.id + ": " + department.name)});
+
+        inquirer.prompt([
+            {
+                type: "list",
+                name: "department",
+                message: "Which department would you like to the utilized budget of?",
+                choices: departmentList
+            }
+        ])
+        .then(answers => {
+            connection.query("SELECT salary FROM employee JOIN role ON role_id=role.id WHERE ?",
+            [ 
+                {
+                    department_id: answers.department[0],
+                }
+            ],
+            (err,res) => {
+                let totalSalary = 0;
+                res.forEach(salary => totalSalary += salary.salary)
+                console.log("The total utilized budget for the request department is : " + totalSalary);
                 if (err) throw err;
                 start();
             });
