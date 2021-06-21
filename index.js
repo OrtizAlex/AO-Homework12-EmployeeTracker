@@ -208,15 +208,11 @@ function updateEmployeeRole(){
     connection.query("SELECT employee.id, first_name, last_name, title, role_id FROM employee JOIN role ON role_id=role.id", (err,res) => {
         if(err) throw err;
 
-        console.table(res);
-
         var employeeList = [];
         res.forEach(employee => {employeeList.push(employee.id + ": " + employee.first_name + " " + employee.last_name)});
 
         var roleChoices = [];
         res.forEach(role => {roleChoices.push(role.role_id + ": " + role.title)});
-
-        console.log(roleChoices);
 
         inquirer.prompt([
             {
@@ -253,3 +249,55 @@ function updateEmployeeRole(){
         })
     })
 }
+
+function updateEmployeeManager(){
+    connection.query("SELECT id, first_name, last_name, manager_id FROM employee", (err,res) => {
+        if(err) throw err;
+
+        console.table(res);
+
+        var employeeList = [];
+        res.forEach(employee => {employeeList.push(employee.id + ": " + employee.first_name + " " + employee.last_name)});
+
+        
+
+        inquirer.prompt([
+            {
+                type: "list",
+                name: "employee",
+                message: "Which employee would you like to change manager?",
+                choices: employeeList
+            },
+            {
+                type: "list",
+                name: "manager",
+                message: "Which manager would you like to change the employee to?",
+                choices: employeeList
+            }
+
+        ])
+        .then(answers => {
+            //console.log(answers.role[0]);
+
+
+            connection.query("UPDATE employee SET ? WHERE ?",
+            [ 
+                {
+                    manager_id: answers.manager[0],
+                },
+                {
+                    id: answers.employee[0],
+                }
+            ],
+            (err,res) => {
+                if (err) throw err;
+                start();
+            });
+        })
+    })
+}
+
+connection.connect((err) => {
+    if (err) throw err;
+    start();
+});
